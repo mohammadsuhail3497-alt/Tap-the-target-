@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tap The Target</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#080d1c;
+  color:white;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.game{
+  width:100%;
+  max-width:500px;
+  min-height:100vh;
+  background:#0d1428;
+  overflow:hidden;
+  position:relative;
+}
+
+.screen{
+  display:none;
+  min-height:100vh;
+  padding:25px 18px;
+}
+
+.screen.active{
+  display:block;
+}
+
+.logo{
+  text-align:center;
+  font-size:38px;
+  font-weight:bold;
+  margin-top:50px;
+  margin-bottom:15px;
+  color:#00e5ff;
+  text-shadow:0 0 15px #00e5ff;
+}
+
+.subtitle{
+  text-align:center;
+  color:#aab4cc;
+  margin-bottom:35px;
+}
+
+.btn{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding:16px;
+  margin:8px 0;
+  background:#17233f;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+
+.btn:active{
+  transform:scale(.97);
+}
+
+.primary{
+  background:#00bcd4;
+  color:#001018;
+}
+
+.green{
+  background:#20c997;
+  color:#00130d;
+}
+
+.orange{
+  background:#ff9800;
+  color:#1b0d00;
+}
+
+.red{
+  background:#e53935;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.stat{
+  background:#121e38;
+  padding:14px;
+  border-radius:12px;
+  text-align:center;
+}
+
+.stat small{
+  display:block;
+  color:#8d9ab5;
+  margin-bottom:5px;
+}
+
+.stat b{
+  font-size:20px;
+}
+
+.title{
+  text-align:center;
+  font-size:28px;
+  margin:15px 0 25px;
+  color:#00e5ff;
+}
+
+.level-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.level{
+  background:#17233f;
+  border-radius:15px;
+  padding:22px 10px;
+  text-align:center;
+  cursor:pointer;
+  border:1px solid #26375c;
+}
+
+.level:active{
+  transform:scale(.97);
+}
+
+.level b{
+  display:block;
+  font-size:24px;
+  margin-bottom:8px;
+}
+
+.level span{
+  color:#9ba8c2;
+  font-size:13px;
+}
+
+.game-header{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin-bottom:8px;
+}
+
+.game-stat{
+  background:#121e38;
+  border-radius:10px;
+  padding:8px 3px;
+  text-align:center;
+  font-size:13px;
+}
+
+.game-stat b{
+  display:block;
+  font-size:17px;
+  margin-top:3px;
+}
+
+.combo-box{
+  display:flex;
+  justify-content:space-between;
+  background:#111c34;
+  border-radius:12px;
+  padding:10px 14px;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.combo{
+  color:#ffca28;
+}
+
+.multiplier{
+  color:#00e5ff;
+}
+
+#playArea{
+  width:100%;
+  height:calc(100vh - 190px);
+  min-height:450px;
+  max-height:650px;
+  background:#080f20;
+  border:2px solid #1c3158;
+  border-radius:15px;
+  position:relative;
+  overflow:hidden;
+}
+
+.target{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  position:absolute;
+  cursor:pointer;
+  background:#ff1744;
+  border:5px solid white;
+  box-shadow:0 0 20px #ff1744;
+  animation:pop .15s ease-out;
+}
+
+.target:after{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:white;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+
+@keyframes pop{
+  from{
+    transform:scale(.2);
+    opacity:.2;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.shop-item{
+  background:#121e38;
+  padding:15px;
+  border-radius:14px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.skin-preview{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  border:4px solid white;
+  flex-shrink:0;
+}
+
+.shop-info{
+  flex:1;
+}
+
+.shop-info b{
+  display:block;
+  margin-bottom:5px;
+}
+
+.shop-info span{
+  color:#9ba8c2;
+  font-size:13px;
+}
+
+.shop-item button{
+  border:0;
+  border-radius:9px;
+  padding:9px 12px;
+  background:#00bcd4;
+  font-weight:bold;
+}
+
+.result{
+  text-align:center;
+  margin-top:70px;
+}
+
+.result h1{
+  color:#ffca28;
+  font-size:35px;
+  margin-bottom:20px;
+}
+
+.big-score{
+  font-size:60px;
+  font-weight:bold;
+  color:#00e5ff;
+  margin:10px 0 25px;
+}
+
+.reward{
+  background:#121e38;
+  border-radius:15px;
+  padding:18px;
+  margin-bottom:20px;
+  line-height:1.4;
+}
+
+.message{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translateX(-50%);
+  background:#ffffff;
+  color:#111;
+  padding:12px 20px;
+  border-radius:25px;
+  font-weight:bold;
+  display:none;
+  z-index:999;
+  box-shadow:0 5px 20px rgba(0,0,0,.4);
+}
+
+.back{
+  background:#202d49;
+}
+
+.note{
+  text-align:center;
+  color:#7f8ca8;
+  font-size:12px;
+  margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+  <!-- HOME -->
+  <div id="home" class="screen active">
+
+    <div class="logo">🎯 TAP THE TARGET</div>
+    <div class="subtitle">Tap fast. Build your combo. Beat your high score!</div>
+
+    <div class="stats">
+      <div class="stat">
+        <small>🪙 Coins</small>
+        <b id="homeCoins">0</b>
+      </div>
+
+      <div class="stat">
+        <small>🏆 High Score</small>
+        <b id="homeHigh">0</b>
+      </div>
+    </div>
+
+    <button class="btn primary" onclick="openLevels()">
+      ▶ PLAY GAME
+    </button>
+
+    <button class="btn" onclick="openShop()">
+      🛒 SHOP
+    </button>
+
+    <button class="btn green" onclick="dailyReward()">
+      🎁 DAILY REWARD
+    </button>
+
+    <button class="btn" onclick="toggleSound()">
+      🔊 SOUND: <span id="soundText">ON</span>
+    </button>
+
+    <button class="btn red" onclick="resetGame()">
+      ♻ RESET DATA
+    </button>
+
+    <div class="note">
+      High Score automatically save hota hai.
+    </div>
+
+  </div>
+
+
+  <!-- LEVELS -->
+  <div id="levels" class="screen">
+
+    <h2 class="title">SELECT LEVEL</h2>
+
+    <div class="level-grid">
+
+      <div class="level" onclick="startGame(1)">
+        <b>LEVEL 1</b>
+        <span>Easy • +1 coin</span>
+      </div>
+
+      <div class="level" onclick="startGame(2)">
+        <b>LEVEL 2</b>
+        <span>Normal • +2 coins</span>
+      </div>
+
+      <div class="level" onclick="startGame(3)">
+        <b>LEVEL 3</b>
+        <span>Fast • +3 coins</span>
+      </div>
+
+      <div class="level" onclick="startGame(4)">
+        <b>LEVEL 4</b>
+        <span>Hard • +4 coins</span>
+      </div>
+
+      <div class="level" onclick="startGame(5)">
+        <b>LEVEL 5</b>
+        <span>Extreme • +5 coins</span>
+      </div>
+
+      <div class="level" onclick="startGame(6)">
+        <b>LEVEL 6</b>
+        <span>Insane • +7 coins</span>
+      </div>
+
+    </div>
+
+    <button class="btn back" onclick="showScreen('home')">
+      ← BACK
+    </button>
+
+  </div>
+
+
+  <!-- GAME -->
+  <div id="gameScreen" class="screen">
+
+    <div class="game-header">
+
+      <div class="game-stat">
+        SCORE
+        <b id="score">0</b>
+      </div>
+
+      <div class="game-stat">
+        LIVES
+        <b id="lives">❤️❤️❤️</b>
+      </div>
+
+      <div class="game-stat">
+        COINS
+        <b id="gameCoins">0</b>
+      </div>
+
+      <div class="game-stat">
+        TIME
+        <b id="timer">30</b>
+      </div>
+
+    </div>
+
+    <div class="combo-box">
+
+      <div class="combo">
+        🔥 Combo:
+        <span id="combo">0</span>
+      </div>
+
+      <div class="multiplier">
+        ⚡ Multiplier:
+        <span id="multiplier">×1</span>
+      </div>
+
+    </div>
+
+    <div id="playArea"></div>
+
+    <button class="btn back" onclick="quitGame()">
+      ✕ EXIT GAME
+    </button>
+
+  </div>
+
+
+  <!-- SHOP -->
+  <div id="shop" class="screen">
+
+    <h2 class="title">🛒 SHOP</h2>
+
+    <div class="stat" style="margin-bottom:15px;">
+      🪙 Coins:
+      <b id="shopCoins">0</b>
+    </div>
+
+
+    <div class="shop-item">
+
+      <div class="skin-preview"
+           style="background:#ff1744;"></div>
+
+      <div class="shop-info">
+        <b>Classic</b>
+        <span>Free</span>
+      </div>
+
+      <button onclick="buySkin('classic',0)">
+        USE
+      </button>
+
+    </div>
+
+
+    <div class="shop-item">
+
+      <div class="skin-preview"
+           style="background:#00e5ff;"></div>
+
+      <div class="shop-info">
+        <b>Cyber Blue</b>
+        <span>50 coins</span>
+      </div>
+
+      <button onclick="buySkin('blue',50)">
+        BUY
+      </button>
+
+    </div>
+
+
+    <div class="shop-item">
+
+      <div class="skin-preview"
+           style="background:#76ff03;"></div>
+
+      <div class="shop-info">
+        <b>Neon Green</b>
+        <span>100 coins</span>
+      </div>
+
+      <button onclick="buySkin('green',100)">
+        BUY
+      </button>
+
+    </div>
+
+
+    <div class="shop-item">
+
+      <div class="skin-preview"
+           style="background:#ffea00;"></div>
+
+      <div class="shop-info">
+        <b>Gold</b>
+        <span>200 coins</span>
+      </div>
+
+      <button onclick="buySkin('gold',200)">
+        BUY
+      </button>
+
+    </div>
+
+
+    <div class="shop-item">
+
+      <div class="skin-preview"
+           style="background:#e040fb;"></div>
+
+      <div class="shop-info">
+        <b>Purple</b>
+        <span>300 coins</span>
+      </div>
+
+      <button onclick="buySkin('purple',300)">
+        BUY
+      </button>
+
+    </div>
+
+
+    <div class="shop-item">
+
+      <div class="skin-preview"
+           style="background:#ffffff;"></div>
+
+      <div class="shop-info">
+        <b>White</b>
+        <span>500 coins</span>
+      </div>
+
+      <button onclick="buySkin('white',500)">
+        BUY
+      </button>
+
+    </div>
+
+
+    <button class="btn back" onclick="showScreen('home')">
+      ← BACK
+    </button>
+
+  </div>
+
+
+  <!-- GAME OVER -->
+  <div id="gameOver" class="screen">
+
+    <div class="result">
+
+      <h1>GAME OVER</h1>
+
+      <p>Your Score</p>
+
+      <div class="big-score" id="finalScore">
+        0
+      </div>
+
+      <div class="reward">
+
+        🪙 Coins earned:
+        <b id="earnedCoins">0</b>
+
+        <br><br>
+
+        🔥 Best Combo:
+        <b id="finalCombo">0</b>
+
+        <br><br>
+
+        🏆 High Score:
+        <b id="finalHighScore">0</b>
+
+      </div>
+
+      <button class="btn primary" onclick="retryGame()">
+        🔄 PLAY AGAIN
+      </button>
+
+      <button class="btn back" onclick="showScreen('home')">
+        🏠 HOME
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div id="message" class="message"></div>
+
+
+<script>
+
+/* =========================
+   GAME DATA
+========================= */
+
+let coins =
+  Number(localStorage.getItem("tt_coins")) || 0;
+
+let highScore =
+  Number(localStorage.getItem("tt_highScore")) || 0;
+
+let currentSkin =
+  localStorage.getItem("tt_skin") || "classic";
+
+let ownedSkins;
+
+try{
+
+  ownedSkins =
+    JSON.parse(
+      localStorage.getItem("tt_ownedSkins")
+      || '["classic"]'
+    );
+
+}catch(error){
+
+  ownedSkins = ["classic"];
+
+}
+
+let soundOn =
+  localStorage.getItem("tt_sound") !== "false";
+
+
+/* GAME VARIABLES */
+
+let score = 0;
+let gameCoins = 0;
+let level = 1;
+let lives = 3;
+let timeLeft = 30;
+
+let gameRunning = false;
+
+let targetTimer = null;
+let gameTimer = null;
+
+let combo = 0;
+let bestCombo = 0;
+let multiplier = 1;
+
+
+/* LEVEL SETTINGS */
+
+const levelTime = {
+
+  1:1800,
+  2:1500,
+  3:1200,
+  4:950,
+  5:750,
+  6:600
+
+};
+
+const levelCoins = {
+
+  1:1,
+  2:2,
+  3:3,
+  4:4,
+  5:5,
+  6:7
+
+};
+
+
+/* SKIN COLORS */
+
+const skinColors = {
+
+  classic:"#ff1744",
+  blue:"#00e5ff",
+  green:"#76ff03",
+  gold:"#ffea00",
+  purple:"#e040fb",
+  white:"#ffffff"
+
+};
+
+
+/* =========================
+   SAVE DATA
+========================= */
+
+function saveData(){
+
+  localStorage.setItem(
+    "tt_coins",
+    String(coins)
+  );
+
+  localStorage.setItem(
+    "tt_highScore",
+    String(highScore)
+  );
+
+  localStorage.setItem(
+    "tt_skin",
+    currentSkin
+  );
+
+  localStorage.setItem(
+    "tt_ownedSkins",
+    JSON.stringify(ownedSkins)
+  );
+
+  localStorage.setItem(
+    "tt_sound",
+    String(soundOn)
+  );
+
+}
+
+
+/* =========================
+   UPDATE UI
+========================= */
+
+function updateUI(){
+
+  document.getElementById("homeCoins").textContent =
+    coins;
+
+  document.getElementById("homeHigh").textContent =
+    highScore;
+
+  document.getElementById("shopCoins").textContent =
+    coins;
+
+  document.getElementById("soundText").textContent =
+    soundOn ? "ON" : "OFF";
+
+}
+
+
+/* =========================
+   SCREEN
+========================= */
+
+function showScreen(id){
+
+  const screens =
+    document.querySelectorAll(".screen");
+
+  screens.forEach(function(screen){
+
+    screen.classList.remove("active");
+
+  });
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+
+}
+
+
+/* =========================
+   LEVELS
+========================= */
+
+function openLevels(){
+
+  showScreen("levels");
+
+}
+
+
+/* =========================
+   SHOP
+========================= */
+
+function openShop(){
+
+  updateUI();
+
+  showScreen("shop");
+
+}
+
+
+/* =========================
+   START GAME
+========================= */
+
+function startGame(selectedLevel){
+
+  level = selectedLevel;
+
+  score = 0;
+  gameCoins = 0;
+  lives = 3;
+  timeLeft = 30;
+
+  combo = 0;
+  bestCombo = 0;
+  multiplier = 1;
+
+  gameRunning = true;
+
+
+  clearTimeout(targetTimer);
+  clearInterval(gameTimer);
+
+
+  document.getElementById("score").textContent =
+    score;
+
+  document.getElementById("gameCoins").textContent =
+    gameCoins;
+
+  document.getElementById("timer").textContent =
+    timeLeft;
+
+
+  updateLives();
+
+  updateComboUI();
+
+
+  showScreen("gameScreen");
+
+  playSound("start");
+
+  spawnTarget();
+
+
+  gameTimer = setInterval(function(){
+
+    if(!gameRunning){
+      return;
+    }
+
+    timeLeft--;
+
+    document.getElementById("timer").textContent =
+      timeLeft;
+
+    if(timeLeft <= 0){
+
+      gameOver();
+
+    }
+
+  },1000);
+
+}
+
+
+/* =========================
+   SPAWN TARGET
+========================= */
+
+function spawnTarget(){
+
+  if(!gameRunning){
+    return;
+  }
+
+
+  clearTimeout(targetTimer);
+
+
+  const playArea =
+    document.getElementById("playArea");
+
+
+  playArea.innerHTML = "";
+
+
+  const target =
+    document.createElement("div");
+
+
+  target.className = "target";
+
+
+  const size = 58;
+
+
+  const maxX =
+    Math.max(0, playArea.clientWidth - size);
+
+  const maxY =
+    Math.max(0, playArea.clientHeight - size);
+
+
+  const x =
+    Math.floor(Math.random() * (maxX + 1));
+
+  const y =
+    Math.floor(Math.random() * (maxY + 1));
+
+
+  target.style.left = x + "px";
+
+  target.style.top = y + "px";
+
+
+  target.style.background =
+    skinColors[currentSkin];
+
+
+  target.style.boxShadow =
+    "0 0 20px " + skinColors[currentSkin];
+
+
+  target.onclick = function(event){
+
+    event.stopPropagation();
+
+    hitTarget();
+
+  };
+
+
+  playArea.appendChild(target);
+
+
+  targetTimer =
+    setTimeout(function(){
+
+      missTarget();
+
+    },levelTime[level]);
+
+}
+
+
+/* =========================
+   HIT TARGET
+========================= */
+
+function hitTarget(){
+
+  if(!gameRunning){
+    return;
+  }
+
+
+  combo++;
+
+
+  if(combo > bestCombo){
+
+    bestCombo = combo;
+
+  }
+
+
+  if(combo >= 20){
+
+    multiplier = 5;
+
+  }
+  else if(combo >= 15){
+
+    multiplier = 4;
+
+  }
+  else if(combo >= 10){
+
+    multiplier = 3;
+
+  }
+  else if(combo >= 5){
+
+    multiplier = 2;
+
+  }
+  else{
+
+    multiplier = 1;
+
+  }
+
+
+  score += multiplier;
+
+
+  const baseCoins =
+    levelCoins[level];
+
+
+  const earned =
+    baseCoins * multiplier;
+
+
+  coins += earned;
+
+  gameCoins += earned;
+
+
+  document.getElementById("score").textContent =
+    score;
+
+  document.getElementById("gameCoins").textContent =
+    gameCoins;
+
+
+  updateComboUI();
+
+
+  if(score > highScore){
+
+    highScore = score;
+
+    localStorage.setItem(
+      "tt_highScore",
+      String(highScore)
+    );
+
+    document.getElementById("homeHigh").textContent =
+      highScore;
+
+  }
+
+
+  saveData();
+
+  playSound("target");
+
+  spawnTarget();
+
+}
+
+
+/* =========================
+   MISS TARGET
+========================= */
+
+function missTarget(){
+
+  if(!gameRunning){
+    return;
+  }
+
+
+  lives--;
+
+
+  combo = 0;
+
+  multiplier = 1;
+
+
+  updateLives();
+
+  updateComboUI();
+
+
+  showMessage("❌ Miss! Combo reset");
+
+  playSound("miss");
+
+
+  if(lives <= 0){
+
+    gameOver();
+
+    return;
+
+  }
+
+
+  spawnTarget();
+
+}
+
+
+/* =========================
+   COMBO UI
+========================= */
+
+function updateComboUI(){
+
+  document.getElementById("combo").textContent =
+    combo;
+
+  document.getElementById("multiplier").textContent =
+    "×" + multiplier;
+
+}
+
+
+/* =========================
+   LIVES
+========================= */
+
+function updateLives(){
+
+  let hearts = "";
+
+  for(let i = 0; i < lives; i++){
+
+    hearts += "❤️";
+
+  }
+
+  document.getElementById("lives").textContent =
+    hearts;
+
+}
+
+
+/* =========================
+   PLAY AREA MISS
+========================= */
+
+document.getElementById("playArea").onclick =
+function(event){
+
+  if(!gameRunning){
+    return;
+  }
+
+
+  if(event.target === this){
+
+    missTarget();
+
+  }
+
+};
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function gameOver(){
+
+  if(!gameRunning){
+    return;
+  }
+
+
+  gameRunning = false;
+
+
+  clearTimeout(targetTimer);
+
+  clearInterval(gameTimer);
+
+
+  document.getElementById("playArea").innerHTML =
+    "";
+
+
+  if(score > highScore){
+
+    highScore = score;
+
+  }
+
+
+  saveData();
+
+
+  document.getElementById("finalScore").textContent =
+    score;
+
+  document.getElementById("earnedCoins").textContent =
+    gameCoins;
+
+  document.getElementById("finalCombo").textContent =
+    bestCombo;
+
+  document.getElementById("finalHighScore").textContent =
+    highScore;
+
+
+  playSound("gameover");
+
+
+  showScreen("gameOver");
+
+}
+
+
+/* =========================
+   RESTART
+========================= */
+
+function restartGame(){
+
+  startGame(level);
+
+}
+
+
+/* =========================
+   RETRY
+========================= */
+
+function retryGame(){
+
+  startGame(level);
+
+}
+
+
+/* =========================
+   EXIT GAME
+========================= */
+
+function quitGame(){
+
+  gameRunning = false;
+
+
+  clearTimeout(targetTimer);
+
+  clearInterval(gameTimer);
+
+
+  document.getElementById("playArea").innerHTML =
+    "";
+
+
+  saveData();
+
+
+  showScreen("home");
+
+}
+
+
+/* =========================
+   BUY SKIN
+========================= */
+
+function buySkin(name,price){
+
+  if(ownedSkins.includes(name)){
+
+    currentSkin = name;
+
+    saveData();
+
+    showMessage("✅ Skin selected");
+
+    return;
+
+  }
+
+
+  if(coins < price){
+
+    showMessage("❌ Not enough coins");
+
+    return;
+
+  }
+
+
+  coins -= price;
+
+
+  ownedSkins.push(name);
+
+  currentSkin = name;
+
+
+  saveData();
+
+  updateUI();
+
+
+  showMessage("🎨 Skin unlocked!");
+
+}
+
+
+/* =========================
+   DAILY REWARD
+========================= */
+
+function dailyReward(){
+
+  const today =
+    new Date().toISOString().slice(0,10);
+
+
+  const last =
+    localStorage.getItem("tt_rewardDate");
+
+
+  if(last === today){
+
+    showMessage(
+      "🎁 Reward already claimed today"
+    );
+
+    return;
+
+  }
+
+
+  let day =
+    Number(
+      localStorage.getItem("tt_rewardDay")
+    ) || 1;
+
+
+  const rewards = [
+    10,
+    20,
+    30,
+    50,
+    75,
+    100,
+    200
+  ];
+
+
+  const reward =
+    rewards[day - 1];
+
+
+  coins += reward;
+
+
+  localStorage.setItem(
+    "tt_rewardDate",
+    today
+  );
+
+
+  localStorage.setItem(
+    "tt_rewardDay",
+    String(day >= 7 ? 1 : day + 1)
+  );
+
+
+  saveData();
+
+  updateUI();
+
+  playSound("reward");
+
+
+  showMessage(
+    "🎁 +" + reward + " coins!"
+  );
+
+}
+
+
+/* =========================
+   SOUND
+========================= */
+
+let audioContext = null;
+
+
+function beep(frequency,duration){
+
+  if(!soundOn){
+    return;
+  }
+
+
+  try{
+
+    if(!audioContext){
+
+      audioContext =
+        new (window.AudioContext ||
+        window.webkitAudioContext)();
+
+    }
+
+
+    const oscillator =
+      audioContext.createOscillator();
+
+    const gain =
+      audioContext.createGain();
+
+
+    oscillator.frequency.value =
+      frequency;
+
+    oscillator.type = "sine";
+
+
+    gain.gain.setValueAtTime(
+      0.08,
+      audioContext.currentTime
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audioContext.currentTime + duration
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(audioContext.destination);
+
+
+    oscillator.start();
+
+    oscillator.stop(
+      audioContext.currentTime + duration
+    );
+
+  }
+  catch(error){
+
+    /* Sound unavailable */
+
+  }
+
+}
+
+function playSound(type){
+
+  if(!soundOn){
+    return;
+  }
+
+  if(type === "target"){
+    beep(700,0.06);
+  }
+
+  else if(type === "miss"){
+    beep(180,0.12);
+  }
+
+  else if(type === "start"){
+    beep(500,0.08);
+  }
+
+  else if(type === "reward"){
+    beep(900,0.15);
+  }
+
+  else if(type === "gameover"){
+    beep(120,0.20);
+  }
+
+}/* =========================
+   TOGGLE SOUND
+========================= */
+
+function toggleSound(){
+
+  soundOn = !soundOn;
+
+  saveData();
+  updateUI();
+
+  if(soundOn){
+    beep(600,0.08);
+  }
+
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+let messageTimer = null;
+
+function showMessage(text){
+
+  const message =
+    document.getElementById("message");
+
+  message.textContent = text;
+
+  message.style.display = "block";
+
+  clearTimeout(messageTimer);
+
+  messageTimer = setTimeout(function(){
+
+    message.style.display = "none";
+
+  },1800);
+
+}
+
+
+/* =========================
+   RESET GAME
+========================= */
+
+function resetGame(){
+
+  const confirmReset =
+    confirm(
+      "Are you sure you want to reset ALL game data?"
+    );
+
+  if(!confirmReset){
+    return;
+  }
+
+  clearTimeout(targetTimer);
+  clearInterval(gameTimer);
+
+  gameRunning = false;
+
+  localStorage.removeItem("tt_coins");
+  localStorage.removeItem("tt_highScore");
+  localStorage.removeItem("tt_skin");
+  localStorage.removeItem("tt_ownedSkins");
+  localStorage.removeItem("tt_sound");
+  localStorage.removeItem("tt_rewardDate");
+  localStorage.removeItem("tt_rewardDay");
+
+  coins = 0;
+  highScore = 0;
+  currentSkin = "classic";
+  ownedSkins = ["classic"];
+  soundOn = true;
+
+  combo = 0;
+  bestCombo = 0;
+  multiplier = 1;
+
+  updateUI();
+
+  showScreen("home");
+
+  showMessage("♻️ All data reset!");
+
+}
+
+
+/* =========================
+   LOAD GAME
+========================= */
+
+updateUI();
+
+</script>
+
+</body>
+</html>
